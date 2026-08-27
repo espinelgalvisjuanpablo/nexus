@@ -1,23 +1,58 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS - IA, Websites & Tech Radar</title>
+    <title>NEXUS - Nexo Tecnológico & Tech Radar</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            pink: '#ec4899',
+                            indigo: '#6366f1',
+                            cyan: '#06b6d4'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <!-- jsPDF CDN para Exportación -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
         
+        :root {
+            --bg-color: #050508;
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --text-color: #f3f4f6;
+            --text-muted: #94a3b8;
+            --border-color: rgba(51, 65, 85, 0.8);
+            --header-bg: rgba(5, 5, 8, 0.92);
+        }
+
+        body.light-theme {
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(226, 232, 240, 0.9);
+            --header-bg: rgba(255, 255, 255, 0.92);
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #050508;
-            color: #f3f4f6;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             scroll-behavior: smooth;
+            transition: background-color 0.25s ease, color 0.2s ease;
         }
 
         .code-font {
@@ -61,39 +96,69 @@
             width: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #050508;
+            background: var(--bg-color);
         }
         ::-webkit-scrollbar-thumb {
-            background: #1f2937;
+            background: #334155;
             border-radius: 3px;
+        }
+
+        body.light-theme .bg-slate-950 {
+            background-color: #ffffff !important;
+        }
+        body.light-theme .bg-slate-900, 
+        body.light-theme .bg-slate-900\/80,
+        body.light-theme .bg-slate-900\/90,
+        body.light-theme .bg-slate-900\/60 {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+        }
+        body.light-theme .border-slate-800,
+        body.light-theme .border-slate-800\/80,
+        body.light-theme .border-slate-800\/60 {
+            border-color: rgba(226, 232, 240, 0.9) !important;
+        }
+        body.light-theme .text-slate-200,
+        body.light-theme .text-white {
+            color: #0f172a !important;
+        }
+        body.light-theme .text-slate-400,
+        body.light-theme .text-slate-300 {
+            color: #475569 !important;
+        }
+        body.light-theme pre {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
         }
     </style>
 </head>
 <body class="antialiased selection:bg-pink-500 selection:text-white">
 
-    <!-- STICKY NAVBAR INTEGRADO -->
-    <nav class="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-slate-800/80 px-6 py-3">
+    <!-- STICKY NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-slate-800/80 px-6 py-3 transition-colors">
         <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
             
             <div class="flex items-center justify-between w-full lg:w-auto gap-4">
                 <a href="#hero" class="text-xl font-extrabold text-white tracking-widest code-font flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-sm bg-pink-500"></span>
-                    NEXUS
+                    <span id="nav-brand-title">NEXUS</span>
                 </a>
 
-                <!-- Accesos integrados en mobile -->
+                <!-- Accesos en móvil -->
                 <div class="flex lg:hidden items-center gap-2">
                     <a href="https://portafolio-jpeg.vercel.app/" target="_blank" rel="noopener" 
-                       class="group flex items-center gap-1.5 bg-slate-900 border border-pink-500/50 text-slate-200 px-2.5 py-1 rounded-full text-xs code-font">
+                       class="flex items-center gap-1.5 bg-slate-900 border border-pink-500/50 text-slate-200 px-2.5 py-1 rounded-full text-xs code-font">
                         <span class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded">JPEG</span>
                     </a>
                     <button onclick="toggleLanguage()" class="bg-slate-900 text-xs font-bold text-slate-200 px-2.5 py-1 rounded-full border border-pink-500/40 code-font">
-                        <span class="mobile-lang-text">ES</span>
+                        <span class="mobile-lang-text">ESP</span>
+                    </button>
+                    <button onclick="toggleTheme()" class="bg-slate-900 text-xs font-bold text-slate-200 px-2.5 py-1 rounded-full border border-pink-500/40 code-font">
+                        <span class="mobile-theme-icon">🌙</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Navegación Principal con Arquitectura -->
+            <!-- Navegación Principal -->
             <div class="flex flex-wrap items-center justify-center gap-3 md:gap-5 text-xs md:text-sm font-semibold code-font">
                 <a href="#noticias" class="text-slate-300 hover:text-pink-400 transition-colors flex items-center gap-1">
                     <span>📰</span>
@@ -101,7 +166,7 @@
                 </a>
                 <a href="#podio" class="text-slate-300 hover:text-pink-400 transition-colors flex items-center gap-1">
                     <span>🏆</span>
-                    <span data-es="Podium" data-en="Podium">Podium</span>
+                    <span data-es="Podio" data-en="Podium">Podio</span>
                 </a>
                 <a href="#timeline" class="text-slate-300 hover:text-pink-400 transition-colors flex items-center gap-1">
                     <span>⏳</span>
@@ -117,9 +182,9 @@
                 </a>
             </div>
 
-            <!-- Buscador + Acciones Integradas (Desktop) -->
-            <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
-                <div class="relative w-full lg:w-44">
+            <!-- Buscador + Acciones (Desktop) -->
+            <div class="flex items-center gap-2.5 w-full lg:w-auto justify-end">
+                <div class="relative w-full lg:w-40">
                     <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-500"></i>
                     <input type="text" id="search-input" onkeyup="filterContent()" 
                            placeholder="Buscar..." 
@@ -130,22 +195,23 @@
 
                 <!-- JPEG Custom Portfolio Link -->
                 <a href="https://portafolio-jpeg.vercel.app/" target="_blank" rel="noopener" 
-                   class="hidden lg:flex shrink-0 items-center gap-2 bg-slate-900 hover:bg-slate-800 border border-pink-500/50 hover:border-pink-400 text-slate-200 hover:text-white px-3 py-1.5 rounded-full shadow-lg transition-all duration-300 code-font">
-                    <span class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black text-[10px] px-2 py-0.5 rounded-md tracking-wider">
+                   class="hidden lg:flex shrink-0 items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-pink-500/50 hover:border-pink-400 text-slate-200 hover:text-white px-3 py-1.5 rounded-full shadow-lg transition-all duration-300 code-font text-xs font-bold">
+                    <span class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded tracking-wider">
                         JPEG
                     </span>
-                    <span class="text-xs font-bold" data-es="Portafolio" data-en="Portfolio">Portafolio</span>
+                    <span data-es="Portafolio" data-en="Portfolio">Portafolio</span>
                 </a>
 
                 <!-- Language Toggle -->
-                <div class="hidden lg:flex shrink-0 items-center gap-1.5 bg-slate-900 border border-slate-800 p-1 rounded-full">
-                    <button id="lang-toggle" onclick="toggleLanguage()" class="relative flex items-center bg-slate-950 text-xs font-bold text-slate-200 px-3 py-1 rounded-full border border-pink-500/40 hover:border-pink-500 transition-all cursor-pointer">
-                        <span class="flex items-center gap-1.5">
-                            <i data-lucide="globe" class="w-3.5 h-3.5 text-pink-500"></i>
-                            <span id="current-lang">ES</span>
-                        </span>
-                    </button>
-                </div>
+                <button id="lang-toggle" onclick="toggleLanguage()" class="hidden lg:flex shrink-0 items-center gap-1 bg-slate-900 border border-slate-800 hover:border-pink-500 text-xs font-bold text-slate-200 px-2.5 py-1.5 rounded-full transition-all cursor-pointer code-font">
+                    <i data-lucide="globe" class="w-3.5 h-3.5 text-pink-500"></i>
+                    <span id="current-lang">ESP</span>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" onclick="toggleTheme()" class="hidden lg:flex shrink-0 items-center justify-center bg-slate-900 border border-slate-800 hover:border-pink-500 text-xs font-bold text-slate-200 w-8 h-8 rounded-full transition-all cursor-pointer" title="Modo Claro/Oscuro / Theme Toggle">
+                    <span id="desktop-theme-icon">🌙</span>
+                </button>
             </div>
         </div>
     </nav>
@@ -213,7 +279,7 @@
         <div class="space-y-1" id="today-table-body"></div>
     </section>
 
-    <!-- PODIO TOP 3 -->
+    <!-- PODIO TOP 3 CON CODEX EN PRIMER LUGAR -->
     <section id="podio" class="py-20 px-6 max-w-7xl mx-auto border-t border-slate-800">
         <div class="text-center max-w-2xl mx-auto mb-16">
             <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest code-font" data-es="// RANKING SEMANAL" data-en="// WEEKLY RANKING">// RANKING SEMANAL</span>
@@ -227,8 +293,9 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end max-w-5xl mx-auto pt-8">
-            <!-- 2ND PLACE -->
-            <div class="bg-slate-900/80 border border-indigo-500/40 rounded-2xl p-6 flex flex-col justify-between h-[360px] relative podium-glow-2 order-2 md:order-1">
+            
+            <!-- 2ND PLACE: ZAI / CITA -->
+            <div class="bg-slate-900/80 border border-indigo-500/40 rounded-2xl p-6 flex flex-col justify-between h-[370px] relative podium-glow-2 order-2 md:order-1">
                 <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white font-extrabold text-sm px-4 py-1 rounded-full code-font flex items-center gap-1 shadow-lg">
                     <span>🥈</span> <span data-es="2º LUGAR" data-en="2ND PLACE">2º LUGAR</span>
                 </div>
@@ -244,27 +311,27 @@
                 </a>
             </div>
 
-            <!-- 1ST PLACE -->
-            <div class="bg-gradient-to-b from-pink-950/60 to-slate-900 border-2 border-pink-500 rounded-2xl p-8 flex flex-col justify-between h-[420px] relative podium-glow-1 order-1 md:order-2">
+            <!-- 1ST PLACE: CODEX AI CODING AGENT -->
+            <div class="bg-gradient-to-b from-pink-950/60 to-slate-900 border-2 border-pink-500 rounded-2xl p-8 flex flex-col justify-between h-[430px] relative podium-glow-1 order-1 md:order-2">
                 <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-pink-500 text-white font-black text-base px-6 py-1.5 rounded-full code-font flex items-center gap-1.5 shadow-xl">
-                    <span>👑</span> <span data-es="1º LUGAR" data-en="1ST PLACE">1ST PLACE</span>
+                    <span>👑</span> <span data-es="1º LUGAR" data-en="1ST PLACE">1º LUGAR</span>
                 </div>
                 <div class="pt-4 space-y-3">
-                    <span class="text-xs font-bold px-3 py-1 rounded bg-pink-500/30 text-pink-300 code-font" data-es="PRODUCTIVIDAD WEB" data-en="WEB PRODUCTIVITY">PRODUCTIVIDAD WEB</span>
-                    <h3 class="text-3xl font-black text-white mt-1">Excalidraw AI</h3>
-                    <p class="text-sm text-slate-200 leading-relaxed" data-es="Pizarra virtual infinita colaborativa con conversión automática de bocetos a diagramas digitales." data-en="Infinite collaborative whiteboard with automatic conversion of sketches to digital diagrams.">
-                        Pizarra virtual infinita colaborativa con conversión automática de bocetos a diagramas digitales.
+                    <span class="text-xs font-bold px-3 py-1 rounded bg-pink-500/30 text-pink-300 code-font" data-es="AGENTE DE CÓDIGO & IA" data-en="AI CODING AGENT">AGENTE DE CÓDIGO & IA</span>
+                    <h3 class="text-3xl font-black text-white mt-1">Codex AI Assistant</h3>
+                    <p class="text-sm text-slate-200 leading-relaxed font-light" data-es="Motor inteligente de asistencia de programación que automatiza refactorizaciones, genera tests unitarios y escribe código limpio en múltiples lenguajes." data-en="Intelligent programming assistant engine that automates refactoring, generates unit tests, and writes clean code across multiple stacks.">
+                        Motor inteligente de asistencia de programación que automatiza refactorizaciones, genera tests unitarios y escribe código limpio en múltiples lenguajes.
                     </p>
                 </div>
-                <a href="https://excalidraw.com" target="_blank" rel="noopener" class="w-full py-3 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-extrabold code-font text-center shadow-lg transition-colors">
-                    <span data-es="ABRIR APLICACIÓN" data-en="OPEN APP">ABRIR APLICACIÓN</span>
+                <a href="https://github.com/features/copilot" target="_blank" rel="noopener" class="w-full py-3 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-extrabold code-font text-center shadow-lg transition-colors">
+                    <span data-es="DESCUBRIR CODEX" data-en="EXPLORE CODEX">DESCUBRIR CODEX</span>
                 </a>
             </div>
 
-            <!-- 3RD PLACE -->
-            <div class="bg-slate-900/80 border border-emerald-500/40 rounded-2xl p-6 flex flex-col justify-between h-[320px] relative podium-glow-3 order-3">
+            <!-- 3RD PLACE: WISE LIVE RATES -->
+            <div class="bg-slate-900/80 border border-emerald-500/40 rounded-2xl p-6 flex flex-col justify-between h-[330px] relative podium-glow-3 order-3">
                 <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white font-extrabold text-sm px-4 py-1 rounded-full code-font flex items-center gap-1 shadow-lg">
-                    <span>🥉</span> <span data-es="3º LUGAR" data-en="3RD PLACE">3RD PLACE</span>
+                    <span>🥉</span> <span data-es="3º LUGAR" data-en="3RD PLACE">3º LUGAR</span>
                 </div>
                 <div class="pt-4 space-y-3">
                     <span class="text-xs font-bold px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 code-font" data-es="CONVERSOR DE DIVISAS" data-en="CURRENCY CONVERTER">CONVERSOR DE DIVISAS</span>
@@ -291,7 +358,7 @@
                 </h2>
             </div>
 
-            <button onclick="exportToPDF()" class="inline-flex items-center gap-2 bg-slate-900 border border-slate-700 hover:border-pink-500 text-slate-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md code-font">
+            <button onclick="exportToPDF()" class="inline-flex items-center gap-2 bg-slate-900 border border-slate-700 hover:border-pink-500 text-slate-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md code-font cursor-pointer">
                 <i data-lucide="download" class="w-4 h-4 text-pink-500"></i>
                 <span data-es="EXPORTAR HISTÓRICO (PDF)" data-en="EXPORT HISTORY (PDF)">EXPORTAR HISTÓRICO (PDF)</span>
             </button>
@@ -303,92 +370,122 @@
         </div>
     </section>
 
-    <!-- SNIPPETS DE CÓDIGO -->
+    <!-- SNIPPETS DE CÓDIGO CON EXPLICACIONES ADJUNTAS A CADA SNIPPET -->
     <section id="codigo" class="py-20 px-6 max-w-7xl mx-auto border-t border-slate-800">
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-slate-800 pb-6 gap-4">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 border-b border-slate-800 pb-6 gap-4">
             <div>
-                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest code-font" data-es="// RECURSOS TÉCNICOS" data-en="// TECHNICAL SNIPPETS">// RECURSOS TÉCNICOS</span>
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest code-font" data-es="// RECURSOS TÉCNICOS INTEGRADOS" data-en="// INTEGRATED CODE SNIPPETS">// RECURSOS TÉCNICOS INTEGRADOS</span>
                 <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1 flex items-center gap-2">
                     <span>👓</span>
-                    <span data-es="Snippets & Código Listo para Usar" data-en="Ready-to-Use Code Snippets">Snippets & Código Listo para Usar</span>
+                    <span data-es="Snippets con Guía de Integración Directa" data-en="Snippets with Direct Integration Guide">Snippets con Guía de Integración Directa</span>
                 </h2>
             </div>
-        </div>
-
-        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 mb-10 space-y-4">
-            <h3 class="text-base font-bold text-pink-400 code-font flex items-center gap-2" data-es="💡 ¿Cómo usar e integrar estos snippets?" data-en="💡 How to use and integrate these snippets?">
-                💡 ¿Cómo usar e integrar estos snippets?
-            </h3>
-            <p class="text-xs text-slate-300 leading-relaxed font-light" data-es="Estos bloques contienen funciones JavaScript reutilizables diseñadas para copiarse e incorporarse en cualquier proyecto web. Puedes pegarlos dentro de un archivo separado (ejemplo: app.js) o directamente dentro de la etiqueta <script> de tu documento HTML." data-en="These blocks contain reusable JavaScript functions designed to be copied and integrated into any web project. You can paste them inside a separate file (e.g., app.js) or directly inside your HTML document's <script> tag.">
-                Estos bloques contienen funciones JavaScript reutilizables diseñadas para copiarse e incorporarse en cualquier proyecto web. Puedes pegarlos dentro de un archivo separado (ejemplo: app.js) o directamente dentro de la etiqueta &lt;script&gt; de tu documento HTML.
+            <p class="text-xs text-slate-400 code-font max-w-md" data-es="Cada bloque incluye su guía de integración, parámetros y modo de uso junto al código fuente." data-en="Each block includes its integration guide, parameters, and usage instructions right next to the source code.">
+                Cada bloque incluye su guía de integración, parámetros y modo de uso junto al código fuente.
             </p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs code-font">
-                <div class="p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl">
-                    <span class="text-pink-400 font-bold block mb-1" data-es="01. Divisas en Vivo" data-en="01. Live Currency Rates">01. Divisas en Vivo</span>
-                    <span class="text-slate-400 text-[11px]" data-es="Consulta tasas de cambio actualizadas consumiendo un endpoint público gratuito sin autenticación." data-en="Fetch updated exchange rates using a free public endpoint without authentication.">Consulta tasas de cambio actualizadas consumiendo un endpoint público gratuito sin autenticación.</span>
+        </div>
+
+        <!-- SNIPPET 1: DIVISAS EN VIVO -->
+        <div class="mb-14 space-y-3">
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 border-l-4 border-l-pink-500">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="p-1 rounded bg-pink-500/20 text-pink-400 code-font text-xs font-bold">SNIPPET 01</span>
+                    <h3 class="text-base font-bold text-white code-font" data-es="01. Consulta de Tasas de Cambio en Vivo (REST API)" data-en="01. Live Currency Exchange Rates (REST API)">01. Consulta de Tasas de Cambio en Vivo (REST API)</h3>
                 </div>
-                <div class="p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl">
-                    <span class="text-indigo-400 font-bold block mb-1" data-es="02. Interés Compuesto" data-en="02. Compound Interest">02. Interés Compuesto</span>
-                    <span class="text-slate-400 text-[11px]" data-es="Calcula el crecimiento financiero proyectado con aportes opcionales y tasa anual configurable." data-en="Calculates projected financial growth with optional contributions and configurable annual rate.">Calcula el crecimiento financiero proyectado con aportes opcionales y tasa anual configurable.</span>
+                <p class="text-xs text-slate-300 font-light leading-relaxed mb-3" data-es="Consume un endpoint público libre sin token para obtener la tasa de conversión en tiempo real entre monedas como USD, COP, EUR o MXN." data-en="Consumes a free public endpoint without token requirements to fetch real-time conversion rates between currencies like USD, COP, EUR, or MXN.">
+                    Consume un endpoint público libre sin token para obtener la tasa de conversión en tiempo real entre monedas como USD, COP, EUR o MXN.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] code-font text-slate-400 border-t border-slate-800/80 pt-2.5">
+                    <div><span class="text-pink-400 font-bold" data-es="• Integración:" data-en="• Integration:">• Integración:</span> <span data-es="Copia la función y llámala en un evento o al cargar el DOM." data-en="Copy the function and invoke it in an event or DOM ready.">Copia la función y llámala en un evento o al cargar el DOM.</span></div>
+                    <div><span class="text-pink-400 font-bold" data-es="• Parámetros:" data-en="• Parameters:">• Parámetros:</span> baseCurrency (ej. 'USD'), targetCurrency (ej. 'COP')</div>
                 </div>
-                <div class="p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl">
-                    <span class="text-emerald-400 font-bold block mb-1" data-es="03. Modo Claro / Oscuro" data-en="03. Dark / Light Mode">03. Modo Claro / Oscuro</span>
-                    <span class="text-slate-400 text-[11px]" data-es="Alterna dinámicamente la clase 'dark' en el DOM y persiste la preferencia mediante localStorage." data-en="Dynamically toggles the 'dark' class on DOM and persists user preference using localStorage.">Alterna dinámicamente la clase 'dark' en el DOM y persiste la preferencia mediante localStorage.</span>
+            </div>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+                        <span class="text-xs text-slate-400 code-font ml-2">01_fetch_exchange_rate.js</span>
+                    </div>
+                    <button onclick="copyCode('snippet-1', this)" class="bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all code-font flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="copy" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        <span class="copy-label" data-es="Copiar Código" data-en="Copy Code">Copiar Código</span>
+                    </button>
                 </div>
+                <pre class="p-6 text-xs md:text-sm code-font text-slate-300 overflow-x-auto leading-relaxed" id="snippet-1"></pre>
             </div>
         </div>
 
-        <!-- SNIPPETS -->
-        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl mb-8">
-            <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
-                    <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
-                    <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
-                    <span class="text-xs text-slate-400 code-font ml-2">01_fetch_exchange_rate.js</span>
+        <!-- SNIPPET 2: INTERÉS COMPUESTO -->
+        <div class="mb-14 space-y-3">
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 border-l-4 border-l-indigo-500">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="p-1 rounded bg-indigo-500/20 text-indigo-400 code-font text-xs font-bold">SNIPPET 02</span>
+                    <h3 class="text-base font-bold text-white code-font" data-es="02. Proyección de Interés Compuesto con Aportes Mensuales" data-en="02. Compound Interest Projection with Monthly Deposits">02. Proyección de Interés Compuesto con Aportes Mensuales</h3>
                 </div>
-                <button onclick="copyCode('snippet-1', this)" class="bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all code-font flex items-center gap-1.5">
-                    <i data-lucide="copy" class="w-3.5 h-3.5 text-emerald-400"></i>
-                    <span class="copy-label" data-es="Copiar Código" data-en="Copy Code">Copiar Código</span>
-                </button>
+                <p class="text-xs text-slate-300 font-light leading-relaxed mb-3" data-es="Algoritmo matemático de cálculo exponencial para proyecciones de inversión financiera con capitalización y aportes recurrentes." data-en="Mathematical exponential growth algorithm for financial investment projections with compounding and recurrent contributions.">
+                    Algoritmo matemático de cálculo exponencial para proyecciones de inversión financiera con capitalización y aportes recurrentes.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] code-font text-slate-400 border-t border-slate-800/80 pt-2.5">
+                    <div><span class="text-indigo-400 font-bold" data-es="• Integración:" data-en="• Integration:">• Integración:</span> <span data-es="Pega la función en tus utilidades y conéctala a inputs numéricos." data-en="Paste the function in your utils and connect it to form inputs.">Pega la función en tus utilidades y conéctala a inputs numéricos.</span></div>
+                    <div><span class="text-indigo-400 font-bold" data-es="• Retorno:" data-en="• Return:">• Retorno:</span> { finalBalance: Number, totalInvested: Number }</div>
+                </div>
             </div>
-            <pre class="p-6 text-xs md:text-sm code-font text-slate-300 overflow-x-auto leading-relaxed" id="snippet-1"></pre>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+                        <span class="text-xs text-slate-400 code-font ml-2">02_compound_interest_calculator.js</span>
+                    </div>
+                    <button onclick="copyCode('snippet-2', this)" class="bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all code-font flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="copy" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        <span class="copy-label" data-es="Copiar Código" data-en="Copy Code">Copiar Código</span>
+                    </button>
+                </div>
+                <pre class="p-6 text-xs md:text-sm code-font text-slate-300 overflow-x-auto leading-relaxed" id="snippet-2"></pre>
+            </div>
         </div>
 
-        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl mb-8">
-            <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
-                    <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
-                    <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
-                    <span class="text-xs text-slate-400 code-font ml-2">02_compound_interest_calculator.js</span>
+        <!-- SNIPPET 3: TEMA CLARO / OSCURO -->
+        <div class="mb-8 space-y-3">
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 border-l-4 border-l-emerald-500">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="p-1 rounded bg-emerald-500/20 text-emerald-400 code-font text-xs font-bold">SNIPPET 03</span>
+                    <h3 class="text-base font-bold text-white code-font" data-es="03. Gestor de Tema Claro / Oscuro con Persistencia LocalStorage" data-en="03. Light / Dark Theme Manager with LocalStorage Persistence">03. Gestor de Tema Claro / Oscuro con Persistencia LocalStorage</h3>
                 </div>
-                <button onclick="copyCode('snippet-2', this)" class="bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all code-font flex items-center gap-1.5">
-                    <i data-lucide="copy" class="w-3.5 h-3.5 text-emerald-400"></i>
-                    <span class="copy-label" data-es="Copiar Código" data-en="Copy Code">Copiar Código</span>
-                </button>
+                <p class="text-xs text-slate-300 font-light leading-relaxed mb-3" data-es="Controlador reactivo de estilos que conmuta la clase 'dark' en el elemento raíz del DOM y guarda la elección del usuario." data-en="Reactive styling controller that toggles the 'dark' class on the DOM root element and saves user preference.">
+                    Controlador reactivo de estilos que conmuta la clase 'dark' en el elemento raíz del DOM y guarda la elección del usuario.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] code-font text-slate-400 border-t border-slate-800/80 pt-2.5">
+                    <div><span class="text-emerald-400 font-bold" data-es="• Integración:" data-en="• Integration:">• Integración:</span> initDarkModeToggle('id-de-tu-boton')</div>
+                    <div><span class="text-emerald-400 font-bold" data-es="• Persistencia:" data-en="• Persistence:">• Persistencia:</span> localStorage.getItem('theme')</div>
+                </div>
             </div>
-            <pre class="p-6 text-xs md:text-sm code-font text-slate-300 overflow-x-auto leading-relaxed" id="snippet-2"></pre>
-        </div>
 
-        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl mb-8">
-            <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
-                    <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
-                    <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
-                    <span class="text-xs text-slate-400 code-font ml-2">03_dark_light_theme_toggle.js</span>
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+                        <span class="text-xs text-slate-400 code-font ml-2">03_dark_light_theme_toggle.js</span>
+                    </div>
+                    <button onclick="copyCode('snippet-3', this)" class="bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all code-font flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="copy" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        <span class="copy-label" data-es="Copiar Código" data-en="Copy Code">Copiar Código</span>
+                    </button>
                 </div>
-                <button onclick="copyCode('snippet-3', this)" class="bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all code-font flex items-center gap-1.5">
-                    <i data-lucide="copy" class="w-3.5 h-3.5 text-emerald-400"></i>
-                    <span class="copy-label" data-es="Copiar Código" data-en="Copy Code">Copiar Código</span>
-                </button>
+                <pre class="p-6 text-xs md:text-sm code-font text-slate-300 overflow-x-auto leading-relaxed" id="snippet-3"></pre>
             </div>
-            <pre class="p-6 text-xs md:text-sm code-font text-slate-300 overflow-x-auto leading-relaxed" id="snippet-3"></pre>
         </div>
     </section>
 
-    <!-- NUEVA SECCIÓN COMPLETA DE ARQUITECTURA DEL SISTEMA -->
+    <!-- ARQUITECTURA DEL SISTEMA -->
     <section id="arquitectura" class="py-20 px-6 max-w-7xl mx-auto border-t border-slate-800">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-slate-800 pb-6 gap-4">
             <div>
@@ -405,10 +502,7 @@
             </p>
         </div>
 
-        <!-- GRID DE ARQUITECTURA DETALLADA -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-
-            <!-- BLOQUE 1: FRONTEND & SPA -->
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 space-y-4 hover:border-pink-500/40 transition-all">
                 <div class="flex items-center gap-3">
                     <div class="p-2.5 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20">
@@ -420,9 +514,9 @@
                     </div>
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed font-light"
-                   data-es="Construido bajo un paradigma de Single Page Application (SPA) puro, sin sobrecarga de frameworks pesados (Zero-Dependency Design). Todo el enrutamiento y la actualización de vistas se gestionan dinámicamente mediante manipulación directa de la API DOM de JavaScript ES6+, logrando tiempos de carga inferiores a 200ms."
-                   data-en="Built on a pure Single Page Application (SPA) paradigm without heavy framework overhead (Zero-Dependency Design). All routing and view rendering are managed dynamically via direct JavaScript ES6+ DOM API manipulation, achieving sub-200ms render times.">
-                    Construido bajo un paradigma de Single Page Application (SPA) puro, sin sobrecarga de frameworks pesados (Zero-Dependency Design). Todo el enrutamiento y la actualización de vistas se gestionan dinámicamente mediante manipulación directa de la API DOM de JavaScript ES6+, logrando tiempos de carga inferiores a 200ms.
+                   data-es="Construido bajo un paradigma de Single Page Application (SPA) puro, sin sobrecarga de frameworks pesados (Zero-Dependency Design). Todo el enrutamiento y la actualización de vistas se gestionan dinámicamente mediante manipulación directa del DOM en JavaScript ES6+."
+                   data-en="Built on a pure Single Page Application (SPA) paradigm without heavy framework overhead (Zero-Dependency Design). All routing and view rendering are managed dynamically via direct JavaScript ES6+ DOM manipulation.">
+                    Construido bajo un paradigma de Single Page Application (SPA) puro, sin sobrecarga de frameworks pesados (Zero-Dependency Design). Todo el enrutamiento y la actualización de vistas se gestionan dinámicamente mediante manipulación directa del DOM en JavaScript ES6+.
                 </p>
                 <div class="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] code-font text-slate-400">
                     <div><span class="text-pink-400 font-bold">• Paradigm:</span> Client-Side SPA</div>
@@ -432,7 +526,6 @@
                 </div>
             </div>
 
-            <!-- BLOQUE 2: CICLO DE PURGA Y REBOBINADO -->
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 space-y-4 hover:border-indigo-500/40 transition-all">
                 <div class="flex items-center gap-3">
                     <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
@@ -444,9 +537,9 @@
                     </div>
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed font-light"
-                   data-es="El sistema implementa una política de ciclo de vida automatizado de retención de datos de 30 días (30-Day Data Purge Lifecycle). Mediante rutinas de inspección cronológicas ejecutadas al inicializar la aplicación, los registros cuyas marcas de tiempo superen los 30 días naturales son purgados automáticamente mediante un mecanismo simétrico de Recolección de Basura (Garbage Collection) para optimizar memoria."
-                   data-en="The system implements an automated 30-Day Data Retention Lifecycle policy. Through chronological inspection routines executed upon app initialization, entries with timestamps older than 30 calendar days are automatically purged using a symmetric Garbage Collection pattern to optimize client memory.">
-                    El sistema implementa una política de ciclo de vida automatizado de retención de datos de 30 días (30-Day Data Purge Lifecycle). Mediante rutinas de inspección cronológicas ejecutadas al inicializar la aplicación, los registros cuyas marcas de tiempo superen los 30 días naturales son purgados automáticamente mediante un mecanismo simétrico de Recolección de Basura (Garbage Collection) para optimizar memoria.
+                   data-es="El sistema implementa una política de ciclo de vida automatizado de retención de datos de 30 días. Los registros cuyas marcas de tiempo superen los 30 días naturales son purgados automáticamente mediante Garbage Collection para optimizar memoria."
+                   data-en="The system implements an automated 30-Day Data Retention Lifecycle policy. Entries with timestamps older than 30 calendar days are automatically purged using Garbage Collection to optimize client memory.">
+                    El sistema implementa una política de ciclo de vida automatizado de retención de datos de 30 días. Los registros cuyas marcas de tiempo superen los 30 días naturales son purgados automáticamente mediante Garbage Collection para optimizar memoria.
                 </p>
                 <div class="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] code-font text-slate-400">
                     <div><span class="text-indigo-400 font-bold">• Retention:</span> 30 Rolling Days</div>
@@ -456,7 +549,6 @@
                 </div>
             </div>
 
-            <!-- BLOQUE 3: CAPA DE INTEGRACIÓN & APIS -->
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 space-y-4 hover:border-emerald-500/40 transition-all">
                 <div class="flex items-center gap-3">
                     <div class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -468,19 +560,18 @@
                     </div>
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed font-light"
-                   data-es="Consumo de servicios externos mediante la API Fetch nativa con promesas asíncronas (async/await) y manejo de excepciones en caso de degradación de red. La sección Hero integra una simulación física vectorizada utilizando el contexto 2D de la HTML5 Canvas API ejecutada a 60 FPS mediante requestAnimationFrame()."
-                   data-en="External services are consumed using native Fetch API with asynchronous promises (async/await) and fallback error handling. The Hero section features a vectorized physics simulation powered by HTML5 Canvas API 2D context running at 60 FPS via requestAnimationFrame().">
-                    Consumo de servicios externos mediante la API Fetch nativa con promesas asíncronas (async/await) y manejo de excepciones en caso de degradación de red. La sección Hero integra una simulación física vectorizada utilizando el contexto 2D de la HTML5 Canvas API ejecutada a 60 FPS mediante requestAnimationFrame().
+                   data-es="Consumo de servicios externos mediante la API Fetch nativa con promesas asíncronas (async/await) y manejo de excepciones. La sección Hero integra una simulación física vectorizada ejecutada a 60 FPS mediante Canvas 2D."
+                   data-en="External services are consumed using native Fetch API with asynchronous promises (async/await) and fallback handling. The Hero section features a 60 FPS physics simulation powered by HTML5 Canvas.">
+                    Consumo de servicios externos mediante la API Fetch nativa con promesas asíncronas (async/await) y manejo de excepciones. La sección Hero integra una simulación física vectorizada ejecutada a 60 FPS mediante Canvas 2D.
                 </p>
                 <div class="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] code-font text-slate-400">
                     <div><span class="text-emerald-400 font-bold">• API Transport:</span> Fetch API (REST)</div>
                     <div><span class="text-emerald-400 font-bold">• Canvas FPS:</span> 60 FPS Loop</div>
                     <div><span class="text-emerald-400 font-bold">• Vector Icons:</span> Lucide SVG Engine</div>
-                    <div><span class="text-emerald-400 font-bold">• Failover:</span> Cached Data Fallback</div>
+                    <div><span class="text-emerald-400 font-bold">• Failover:</span> Cached Fallback</div>
                 </div>
             </div>
 
-            <!-- BLOQUE 4: UI/UX & PERSISTENCIA -->
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 space-y-4 hover:border-amber-500/40 transition-all">
                 <div class="flex items-center gap-3">
                     <div class="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
@@ -492,9 +583,9 @@
                     </div>
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed font-light"
-                   data-es="Interfaz construida bajo el framework de utilidades Tailwind CSS con paleta semántica oscura (#050508). La configuración del usuario (idioma y preferencia visual) persiste localmente en la Web Storage API (localStorage). Además, la generación del archivo PDF técnico se realiza de manera 100% remota al servidor, directamente en el hilo secundario del navegador cliente mediante la librería jsPDF."
-                   data-en="User interface designed using Tailwind CSS utility-first framework with a dark semantic color system (#050508). User settings (language and visual preferences) persist locally via Web Storage API (localStorage). PDF generation is compiled 100% client-side without server roundtrips using the jsPDF library.">
-                    Interfaz construida bajo el framework de utilidades Tailwind CSS con paleta semántica oscura (#050508). La configuración del usuario (idioma y preferencia visual) persiste localmente en la Web Storage API (localStorage). Además, la generación del archivo PDF técnico se realiza de manera 100% remota al servidor, directamente en el hilo secundario del navegador cliente mediante la librería jsPDF.
+                   data-es="Interfaz responsiva con Tailwind CSS. Las preferencias del usuario (idioma y modo visual claro/oscuro) persisten localmente en la Web Storage API (localStorage)."
+                   data-en="Responsive UI with Tailwind CSS. User preferences (language and dark/light visual theme) persist locally in Web Storage API (localStorage).">
+                    Interfaz responsiva con Tailwind CSS. Las preferencias del usuario (idioma y modo visual claro/oscuro) persisten localmente en la Web Storage API (localStorage).
                 </p>
                 <div class="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] code-font text-slate-400">
                     <div><span class="text-amber-400 font-bold">• Styling:</span> Tailwind Utility Engine</div>
@@ -503,48 +594,6 @@
                     <div><span class="text-amber-400 font-bold">• Typography:</span> Plus Jakarta + JetBrains</div>
                 </div>
             </div>
-
-        </div>
-
-        <!-- TABLA COMPACTA DE METRICAS TECNICAS -->
-        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 overflow-x-auto">
-            <h4 class="text-xs font-bold text-pink-400 code-font mb-4 uppercase tracking-widest" data-es="// MATRIZ DE RENDIMIENTO Y TECNICALIDADES" data-en="// PERFORMANCE & TECHNICAL MATRIX">// MATRIZ DE RENDIMIENTO Y TECNICALIDADES</h4>
-            <table class="w-full text-left text-xs code-font">
-                <thead>
-                    <tr class="border-b border-slate-800 text-slate-400">
-                        <th class="py-2 px-3" data-es="Componente" data-en="Component">Componente</th>
-                        <th class="py-2 px-3" data-es="Tecnología Base" data-en="Core Technology">Tecnología Base</th>
-                        <th class="py-2 px-3" data-es="Patrón de Ejecución" data-en="Execution Pattern">Patrón de Ejecución</th>
-                        <th class="py-2 px-3" data-es="Impacto / Métrica" data-en="Impact / Metric">Impacto / Métrica</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-800/60 text-slate-300">
-                    <tr>
-                        <td class="py-2.5 px-3 font-semibold text-white">Rendering Engine</td>
-                        <td class="py-2.5 px-3">HTML5 + ES6 Vanilla DOM</td>
-                        <td class="py-2.5 px-3 text-slate-400">Reactive DOM Manipulation</td>
-                        <td class="py-2.5 px-3 text-emerald-400">0ms Framework Overhead</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2.5 px-3 font-semibold text-white">Data Lifecycle</td>
-                        <td class="py-2.5 px-3">JSON In-Memory Data Structure</td>
-                        <td class="py-2.5 px-3 text-slate-400">Automatic 30-Day Rolling Purge</td>
-                        <td class="py-2.5 px-3 text-indigo-400">Zero Dead Storage</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2.5 px-3 font-semibold text-white">Localization (i18n)</td>
-                        <td class="py-2.5 px-3">Data-Attribute Dynamic Engine</td>
-                        <td class="py-2.5 px-3 text-slate-400">Bi-directional ES / EN Toggle</td>
-                        <td class="py-2.5 px-3 text-pink-400">Instant Switch (0 Reload)</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2.5 px-3 font-semibold text-white">Hero Particle Physics</td>
-                        <td class="py-2.5 px-3">HTML5 Canvas 2D API</td>
-                        <td class="py-2.5 px-3 text-slate-400">requestAnimationFrame Loop</td>
-                        <td class="py-2.5 px-3 text-amber-400">Locked 60 FPS</td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </section>
 
@@ -553,7 +602,7 @@
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
                 <span>NEXUS RADAR © 2026 • </span>
-                <span data-es="Colombia Edition" data-en="Colombia Edition">Colombia Edition</span>
+                <span data-es="Edición Colombia & Global" data-en="Colombia & Global Edition">Edición Colombia & Global</span>
             </div>
             <div class="flex items-center gap-4">
                 <a href="https://portafolio-jpeg.vercel.app/" target="_blank" rel="noopener" class="text-slate-400 hover:text-pink-400 transition-colors flex items-center gap-1">
@@ -573,6 +622,20 @@
         const DB_ITEMS = [
             {
                 id: 1,
+                title_es: "Codex Asistente Autónomo de Código",
+                title_en: "Codex Autonomous Coding Assistant",
+                type_es: "Agente IA",
+                type_en: "AI Agent",
+                category_es: "Desarrollo",
+                category_en: "Development",
+                desc_es: "Motor inteligente de refactorización, resolución de bugs y generación de pruebas unitarias.",
+                desc_en: "Smart code engine for automated refactoring, bug fixing, and unit test generation.",
+                url: "https://github.com/features/copilot",
+                date: "2026-08-26",
+                pinned: true
+            },
+            {
+                id: 2,
                 title_es: "ZAI / CITA Inteligencia Financiera",
                 title_en: "ZAI / CITA Financial Intelligence",
                 type_es: "Web / IA",
@@ -583,20 +646,6 @@
                 desc_en: "Real-time financial indicators analyzer and currency rate summary tool.",
                 url: "https://zai.finance",
                 date: "2026-08-25",
-                pinned: true
-            },
-            {
-                id: 2,
-                title_es: "Excalidraw Lienzo de Diagramas",
-                title_en: "Excalidraw Diagram Canvas",
-                type_es: "Herramienta",
-                type_en: "Tool",
-                category_es: "Productividad",
-                category_en: "Productivity",
-                desc_es: "Pizarra virtual infinita colaborativa para bosquejar diagramas al instante.",
-                desc_en: "Infinite collaborative virtual whiteboard to sketch diagrams instantly.",
-                url: "https://excalidraw.com",
-                date: "2026-08-22",
                 pinned: false
             },
             {
@@ -634,12 +683,12 @@
                 snippet1: `<code><span class="text-slate-500">// Función asíncrona para consultar el tipo de cambio entre divisas</span>
 <span class="text-purple-400">async function</span> <span class="text-blue-400">getLiveExchangeRate</span>(baseCurrency = <span class="text-emerald-300">'USD'</span>, targetCurrency = <span class="text-emerald-300">'COP'</span>) {
   <span class="text-purple-400">try</span> {
-    <span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> <span class="text-blue-400">fetch</span>(<span class="text-emerald-300">\`https://open.er-api.com/v6/latest/\${baseCurrency}\`</span>);
+    <span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> <span class="text-blue-400">fetch</span>(\`https://open.er-api.com/v6/latest/\${baseCurrency}\`);
     <span class="text-purple-400">const</span> data = <span class="text-purple-400">await</span> response.<span class="text-blue-400">json</span>();
     
     <span class="text-purple-400">if</span> (data.result === <span class="text-emerald-300">'success'</span>) {
       <span class="text-purple-400">const</span> rate = data.rates[targetCurrency];
-      <span class="text-blue-400">console</span>.<span class="text-blue-400">log</span>(<span class="text-emerald-300">\`Tasa 1 \${baseCurrency} = \${rate} \${targetCurrency}\`</span>);
+      <span class="text-blue-400">console</span>.<span class="text-blue-400">log</span>(\`Tasa 1 \${baseCurrency} = \${rate} \${targetCurrency}\`);
       <span class="text-purple-400">return</span> rate;
     }
   } <span class="text-purple-400">catch</span> (error) {
@@ -655,7 +704,7 @@
   <span class="text-purple-400">const</span> rate = annualRatePercent / <span class="text-amber-400">100</span>;
   <span class="text-purple-400">let</span> total = principal;
 
-  <span class="text-purple-400">for</span> (<span class="text-purple-400">let</span> month = <span class="text-amber-400">1</span>; month &lt;= years * <span class="text-amber-400">12</span>; month++) {
+  <span class="text-purple-400">for</span> (<span class="text-purple-400">let</span> month = <span class="text-amber-400">1</span>; month <= years * <span class="text-amber-400">12</span>; month++) {
     total += monthlyContribution;
     total *= (<span class="text-amber-400">1</span> + rate / <span class="text-amber-400">12</span>);
   }
@@ -691,12 +740,12 @@
                 snippet1: `<code><span class="text-slate-500">// Async function to fetch live exchange rates between currencies</span>
 <span class="text-purple-400">async function</span> <span class="text-blue-400">getLiveExchangeRate</span>(baseCurrency = <span class="text-emerald-300">'USD'</span>, targetCurrency = <span class="text-emerald-300">'COP'</span>) {
   <span class="text-purple-400">try</span> {
-    <span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> <span class="text-blue-400">fetch</span>(<span class="text-emerald-300">\`https://open.er-api.com/v6/latest/\${baseCurrency}\`</span>);
+    <span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> <span class="text-blue-400">fetch</span>(\`https://open.er-api.com/v6/latest/\${baseCurrency}\`);
     <span class="text-purple-400">const</span> data = <span class="text-purple-400">await</span> response.<span class="text-blue-400">json</span>();
     
     <span class="text-purple-400">if</span> (data.result === <span class="text-emerald-300">'success'</span>) {
       <span class="text-purple-400">const</span> rate = data.rates[targetCurrency];
-      <span class="text-blue-400">console</span>.<span class="text-blue-400">log</span>(<span class="text-emerald-300">\`Rate 1 \${baseCurrency} = \${rate} \${targetCurrency}\`</span>);
+      <span class="text-blue-400">console</span>.<span class="text-blue-400">log</span>(\`Rate 1 \${baseCurrency} = \${rate} \${targetCurrency}\`);
       <span class="text-purple-400">return</span> rate;
     }
   } <span class="text-purple-400">catch</span> (error) {
@@ -712,7 +761,7 @@
   <span class="text-purple-400">const</span> rate = annualRatePercent / <span class="text-amber-400">100</span>;
   <span class="text-purple-400">let</span> total = principal;
 
-  <span class="text-purple-400">for</span> (<span class="text-purple-400">let</span> month = <span class="text-amber-400">1</span>; month &lt;= years * <span class="text-amber-400">12</span>; month++) {
+  <span class="text-purple-400">for</span> (<span class="text-purple-400">let</span> month = <span class="text-amber-400">1</span>; month <= years * <span class="text-amber-400">12</span>; month++) {
     total += monthlyContribution;
     total *= (<span class="text-amber-400">1</span> + rate / <span class="text-amber-400">12</span>);
   }
@@ -746,31 +795,55 @@
             }
         };
 
-        let currentLang = 'es';
+        let currentLang = localStorage.getItem('nexus_lang') || 'es';
+        let currentTheme = localStorage.getItem('nexus_theme') || 'dark';
 
-        function toggleLanguage() {
-            currentLang = currentLang === 'es' ? 'en' : 'es';
-            
-            // Actualización del label principal de idioma
+        function applyLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('nexus_lang', lang);
+            document.getElementById('html-root').lang = lang;
+
             const desktopLangLabel = document.getElementById('current-lang');
-            if (desktopLangLabel) desktopLangLabel.innerText = currentLang.toUpperCase();
+            if (desktopLangLabel) desktopLangLabel.innerText = lang.toUpperCase();
 
             document.querySelectorAll('.mobile-lang-text').forEach(el => {
-                el.innerText = currentLang.toUpperCase();
+                el.innerText = lang.toUpperCase();
             });
 
-            // CORRECCIÓN DEL BUSCADOR: Actualizar Placeholder dinámicamente
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
-                searchInput.placeholder = searchInput.getAttribute(`data-${currentLang}-placeholder`);
+                searchInput.placeholder = searchInput.getAttribute(`data-${lang}-placeholder`);
             }
             
-            // Actualizar todos los elementos traducibles
             document.querySelectorAll('[data-es]').forEach(el => {
-                el.innerText = el.getAttribute(`data-${currentLang}`);
+                el.innerText = el.getAttribute(`data-${lang}`);
             });
 
             renderAllSections();
+        }
+
+        function toggleLanguage() {
+            applyLanguage(currentLang === 'es' ? 'en' : 'es');
+        }
+
+        function applyTheme(theme) {
+            currentTheme = theme;
+            localStorage.setItem('nexus_theme', theme);
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+                document.documentElement.classList.remove('dark');
+                document.getElementById('desktop-theme-icon').textContent = '☀️';
+                document.querySelectorAll('.mobile-theme-icon').forEach(el => el.textContent = '☀️');
+            } else {
+                document.body.classList.remove('light-theme');
+                document.documentElement.classList.add('dark');
+                document.getElementById('desktop-theme-icon').textContent = '🌙';
+                document.querySelectorAll('.mobile-theme-icon').forEach(el => el.textContent = '🌙');
+            }
+        }
+
+        function toggleTheme() {
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
         }
 
         function renderCodeSnippets() {
@@ -927,7 +1000,7 @@
                 yPos += 25;
             });
 
-            doc.save('Nexus_Radar_Colombia.pdf');
+            doc.save('Nexus_Radar_Tech.pdf');
         }
 
         function renderAllSections() {
@@ -976,7 +1049,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderAllSections();
+            applyLanguage(currentLang);
+            applyTheme(currentTheme);
             initCanvas();
             lucide.createIcons();
         });
