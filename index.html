@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS - IA, Websites & Tech Radar</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jsPDF CDN para Exportación -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050508;
+            color: #f3f4f6;
+            scroll-behavior: smooth;
+        }
+
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 25px rgba(236, 72, 153, 0.6), 0 0 50px rgba(99, 102, 241, 0.4);
+        }
+        
+        .podium-glow-1 {
+            box-shadow: 0 0 35px rgba(236, 72, 153, 0.35);
+        }
+        .podium-glow-2 {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.25);
+        }
+        .podium-glow-3 {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .row-hover {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .row-hover:hover {
+            background: linear-gradient(90deg, rgba(99,102,241,0.08) 0%, rgba(236,72,153,0.05) 100%);
+            border-left-color: #ec4899;
+            padding-left: 1.25rem;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050508;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-pink-500 selection:text-white">
+
+    <!-- STICKY NAVBAR INTEGRADO -->
+    <nav class="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-slate-800/80 px-6 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
+            
+            <div class="flex items-center justify-between w-full lg:w-auto gap-4">
+                <a href="#hero" class="text-xl font-extrabold text-white tracking-widest code-font flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-sm bg-pink-500"></span>
+                    NEXUS
+                </a>
+
+                <!-- Accesos integrados en mobile -->
+                <div class="flex lg:hidden items-center gap-2">
+                    <a href="https://portafolio-jpeg.vercel.app/" target="_blank" rel="noopener" 
+                       class="group flex items-center gap-1.5 bg-slate-900 border border-pink-500/50 text-slate-200 px-2.5 py-1 rounded-full text-xs code-font">
+                        <span class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded">JPEG</span>
+                    </a>
+                    <button onclick="toggleLanguage()" class="bg-slate-900 text-xs font-bold text-slate-200 px-2.5 py-1 rounded-full border border-pink-500/40 code-font">
+                        <span class="mobile-lang-text">ES</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navegación Principal con Arquitectura -->
+            <div class="flex flex-wrap items-center justify-center gap-3 md:gap-5 text-xs md:text-sm font-semibold code-font">
+                <a href="#noticias" class="text-slate-300 hover:text-pink-400 transition-colors flex items-center gap-1">
+                    <span>📰</span>
+                    <span data-es="Noticias" data-en="News">Noticias</span>
+                </a>
+                <a href="#podio" class="text-slate-300 hover:text-pink-400 transition-colors flex items-center gap-1">
+                    <span>🏆</span>
+                    <span data-es="Podium" data-en="Podium">Podium</span>
+                </a>
+                <a href="#timeline" class="text-slate-300 hover:text-pink-400 transition-colors flex items-center gap-1">
+                    <span>⏳</span>
+                    <span data-es="Línea de Tiempo" data-en="Timeline">Línea de Tiempo</span>
+                </a>
+                <a href="#codigo" class="text-slate-300 hover:text-pink-400 transition-colors flex items-center gap-1">
+                    <span>👓</span>
+                    <span data-es="Snippets" data-en="Snippets">Snippets</span>
+                </a>
+                <a href="#arquitectura" class="text-slate-300 hover:text-pink-400 transition-colors flex items-center gap-1">
+                    <span>⚡</span>
+                    <span data-es="Arquitectura" data-en="Architecture">Arquitectura</span>
+                </a>
+            </div>
+
+            <!-- Buscador + Acciones Integradas (Desktop) -->
+            <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
+                <div class="relative w-full lg:w-44">
+                    <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-500"></i>
+                    <input type="text" id="search-input" onkeyup="filterContent()" 
+                           placeholder="Buscar..." 
+                           data-es-placeholder="Buscar..." 
+                           data-en-placeholder="Search..." 
+                           class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-200 pl-9 pr-3 py-1.5 rounded-lg focus:outline-none focus:border-pink-500 transition-all code-font">
+                </div>
+
+                <!-- JPEG Custom Portfolio Link -->
+                <a href="https://portafolio-jpeg.vercel.app/" target="_blank" rel="noopener" 
+                   class="hidden lg:flex shrink-0 items-center gap-2 bg-slate-900 hover:bg-slate-800 border border-pink-500/50 hover:border-pink-400 text-slate-200 hover:text-white px-3 py-1.5 rounded-full shadow-lg transition-all duration-300 code-font">
+                    <span class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black text-[10px] px-2 py-0.5 rounded-md tracking-wider">
+                        JPEG
+                    </span>
+                    <span class="text-xs font-bold" data-es="Portafolio" data-en="Portfolio">Portafolio</span>
+                </a>
+
+                <!-- Language Toggle -->
+                <div class="hidden lg:flex shrink-0 items-center gap-1.5 bg-slate-900 border border-slate-800 p-1 rounded-full">
+                    <button id="lang-toggle" onclick="toggleLanguage()" class="relative flex items-center bg-slate-950 text-xs font-bold text-slate-200 px-3 py-1 rounded-full border border-pink-500/40 hover:border-pink-500 transition-all cursor-pointer">
+                        <span class="flex items-center gap-1.5">
+                            <i data-lucide="globe" class="w-3.5 h-3.5 text-pink-500"></i>
+                            <span id="current-lang">ES</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section id="hero" class="relative min-h-[85vh] flex flex-col justify-between items-center px-6 py-12 overflow-hidden border-b border-slate-800/60">
+        <canvas id="hero-canvas"></canvas>
+        
+        <div class="m-auto text-center z-10 max-w-4xl space-y-6 pt-6">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-500/30 bg-pink-500/10 text-pink-400 text-xs font-semibold tracking-wider uppercase code-font">
+                <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span>
+                <span data-es="NEXUS RADAR EN VIVO • EDICIÓN 2026" data-en="NEXUS LIVE RADAR • 2026 EDITION">NEXUS RADAR EN VIVO • EDICIÓN 2026</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none text-white text-glow">
+                NEXUS<span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">.TECH</span>
+            </h1>
+
+            <p class="text-lg md:text-xl text-slate-400 font-light max-w-2xl mx-auto leading-relaxed"
+               data-es="El radar diario con las mejores herramientas web, inteligencia artificial y soluciones prácticas para potenciar tu productividad."
+               data-en="The daily radar featuring the best web tools, AI, and practical solutions to supercharge your productivity.">
+                El radar diario con las mejores herramientas web, inteligencia artificial y soluciones prácticas para potenciar tu productividad.
+            </p>
+
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#noticias" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-pink-600 to-indigo-600 text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-pink-500/2 font-mono flex items-center justify-center gap-2">
+                    <span data-es="EXPLORAR HOY" data-en="EXPLORE TODAY">EXPLORAR HOY</span>
+                    <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="z-10 w-full max-w-5xl bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-2xl p-4 flex flex-wrap justify-around items-center gap-4 text-xs text-slate-400 code-font">
+            <div class="flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-4 h-4 text-pink-500"></i>
+                <span data-es="70% Herramientas & IA Útiles" data-en="70% Useful Tools & AI">70% Herramientas & IA Útiles</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i data-lucide="newspaper" class="w-4 h-4 text-indigo-400"></i>
+                <span data-es="30% Noticias Destacadas" data-en="30% Top Tech News">30% Noticias Destacadas</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i data-lucide="code" class="w-4 h-4 text-emerald-400"></i>
+                <span data-es="Snippets & Código Listo" data-en="Ready-to-use Snippets">Snippets & Código Listo</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- NOTICIAS Y RECURSOS DEL DÍA -->
+    <section id="noticias" class="py-20 px-6 max-w-7xl mx-auto min-h-screen">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-slate-800 pb-6 gap-4">
+            <div>
+                <span class="text-xs font-bold text-pink-500 uppercase tracking-widest code-font" data-es="// LO MÁS DESTACADO" data-en="// HIGHLIGHTS">// LO MÁS DESTACADO</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1 flex items-center gap-2">
+                    <span>📰</span>
+                    <span data-es="Noticias & Sitios Web del Día" data-en="Today's News & Useful Websites">Noticias & Sitios Web del Día</span>
+                </h2>
+            </div>
+            <p class="text-xs text-slate-400 code-font max-w-md" data-es="Herramientas web de acceso directo, conversores y plataformas útiles seleccionadas hoy." data-en="Direct-access web tools, converters, and top platforms curated today.">
+                Herramientas web de acceso directo, conversores y plataformas útiles seleccionadas hoy.
+            </p>
+        </div>
+
+        <div id="pinned-container" class="mb-8"></div>
+        <div class="space-y-1" id="today-table-body"></div>
+    </section>
+
+    <!-- PODIO TOP 3 -->
+    <section id="podio" class="py-20 px-6 max-w-7xl mx-auto border-t border-slate-800">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest code-font" data-es="// RANKING SEMANAL" data-en="// WEEKLY RANKING">// RANKING SEMANAL</span>
+            <h2 class="text-3xl md:text-5xl font-black text-white mt-2 flex items-center justify-center gap-3">
+                <span>🏆</span>
+                <span data-es="El Podio de la Semana" data-en="Weekly Podium">El Podio de la Semana</span>
+            </h2>
+            <p class="text-xs text-slate-400 code-font mt-2" data-es="Las 3 aplicaciones y plataformas web mejor valoradas por nuestra comunidad." data-en="The top 3 highest-rated web apps and platforms by our community.">
+                Las 3 aplicaciones y plataformas web mejor valoradas por nuestra comunidad.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end max-w-5xl mx-auto pt-8">
+            <!-- 2ND PLACE -->
+            <div class="bg-slate-900/80 border border-indigo-500/40 rounded-2xl p-6 flex flex-col justify-between h-[360px] relative podium-glow-2 order-2 md:order-1">
+                <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white font-extrabold text-sm px-4 py-1 rounded-full code-font flex items-center gap-1 shadow-lg">
+                    <span>🥈</span> <span data-es="2º LUGAR" data-en="2ND PLACE">2º LUGAR</span>
+                </div>
+                <div class="pt-4 space-y-3">
+                    <span class="text-xs font-bold px-2.5 py-1 rounded bg-indigo-500/20 text-indigo-300 code-font" data-es="FINANZAS & INTELIGENCIA" data-en="FINANCE & INTELLIGENCE">FINANZAS & INTELIGENCIA</span>
+                    <h3 class="text-2xl font-extrabold text-white mt-1">ZAI / CITA Platform</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed" data-es="Plataforma interactiva para análisis financiero y simplificación de reportes de activos en tiempo real." data-en="Interactive platform for financial analysis and real-time asset reporting simplification.">
+                        Plataforma interactiva para análisis financiero y simplificación de reportes de activos en tiempo real.
+                    </p>
+                </div>
+                <a href="https://zai.finance" target="_blank" rel="noopener" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-indigo-600 text-white text-xs font-bold code-font text-center transition-colors">
+                    <span data-es="PROBAR AHORA" data-en="TRY NOW">PROBAR AHORA</span>
+                </a>
+            </div>
+
+            <!-- 1ST PLACE -->
+            <div class="bg-gradient-to-b from-pink-950/60 to-slate-900 border-2 border-pink-500 rounded-2xl p-8 flex flex-col justify-between h-[420px] relative podium-glow-1 order-1 md:order-2">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-pink-500 text-white font-black text-base px-6 py-1.5 rounded-full code-font flex items-center gap-1.5 shadow-xl">
+                    <span>👑</span> <span data-es="1º LUGAR" data-en="1ST PLACE">1ST PLACE</span>
+                </div>
+                <div class="pt-4 space-y-3">
+                    <span class="text-xs font-bold px-3 py-1 rounded bg-pink-500/30 text-pink-300 code-font" data-es="PRODUCTIVIDAD WEB" data-en="WEB PRODUCTIVITY">PRODUCTIVIDAD WEB</span>
+                    <h3 class="text-3xl font-black text-white mt-1">Excalidraw AI</h3>
+                    <p class="text-sm text-slate-200 leading-relaxed" data-es="Pizarra virtual infinita colaborativa con conversión automática de bocetos a diagramas digitales." data-en="Infinite collaborative whiteboard with automatic conversion of sketches to digital diagrams.">
+                        Pizarra virtual infinita colaborativa con conversión automática de bocetos a diagramas digitales.
+                    </p>
+                </div>
+                <a href="https://excalidraw.com" target="_blank" rel="noopener" class="w-full py-3 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-extrabold code-font text-center shadow-lg transition-colors">
+                    <span data-es="ABRIR APLICACIÓN" data-en="OPEN APP">ABRIR APLICACIÓN</span>
+                </a>
+            </div>
+
+            <!-- 3RD PLACE -->
+            <div class="bg-slate-900/80 border border-emerald-500/40 rounded-2xl p-6 flex flex-col justify-between h-[320px] relative podium-glow-3 order-3">
+                <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white font-extrabold text-sm px-4 py-1 rounded-full code-font flex items-center gap-1 shadow-lg">
+                    <span>🥉</span> <span data-es="3º LUGAR" data-en="3RD PLACE">3RD PLACE</span>
+                </div>
+                <div class="pt-4 space-y-3">
+                    <span class="text-xs font-bold px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 code-font" data-es="CONVERSOR DE DIVISAS" data-en="CURRENCY CONVERTER">CONVERSOR DE DIVISAS</span>
+                    <h3 class="text-2xl font-extrabold text-white mt-1">Wise Live Rates</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed" data-es="Calculadora y monitor de tasas de cambio internacionales en tiempo real sin comisiones ocultas." data-en="Real-time international currency rate monitor and calculator without hidden fees.">
+                        Calculadora y monitor de tasas de cambio internacionales en tiempo real sin comisiones ocultas.
+                    </p>
+                </div>
+                <a href="https://wise.com" target="_blank" rel="noopener" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-emerald-600 text-white text-xs font-bold code-font text-center transition-colors">
+                    <span data-es="CONSULTAR TASAS" data-en="CHECK RATES">CONSULTAR TASAS</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- LÍNEA DE TIEMPO -->
+    <section id="timeline" class="py-20 px-6 max-w-7xl mx-auto border-t border-slate-800">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 border-b border-slate-800 pb-6 gap-4">
+            <div>
+                <span class="text-xs font-bold text-pink-500 uppercase tracking-widest code-font" data-es="// HISTÓRICO" data-en="// HISTORY">// HISTÓRICO</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1 flex items-center gap-2">
+                    <span>⏳</span>
+                    <span data-es="Línea de Tiempo" data-en="Timeline">Línea de Tiempo</span>
+                </h2>
+            </div>
+
+            <button onclick="exportToPDF()" class="inline-flex items-center gap-2 bg-slate-900 border border-slate-700 hover:border-pink-500 text-slate-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md code-font">
+                <i data-lucide="download" class="w-4 h-4 text-pink-500"></i>
+                <span data-es="EXPORTAR HISTÓRICO (PDF)" data-en="EXPORT HISTORY (PDF)">EXPORTAR HISTÓRICO (PDF)</span>
+            </button>
+        </div>
+
+        <div class="relative max-w-5xl mx-auto px-4">
+            <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-pink-500 via-indigo-500 to-slate-800 -translate-x-1/2"></div>
+            <div class="space-y-12" id="zigzag-container"></div>
+        </div>
+    </section>
+
+    <!-- SNIPPETS DE CÓDIGO -->
+    <section id="codigo" class="py-20 px-6 max-w-7xl mx-auto border-t border-slate-800">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-slate-800 pb-6 gap-4">
+            <div>
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest code-font" data-es="// RECURSOS TÉCNICOS" data-en="// TECHNICAL SNIPPETS">// RECURSOS TÉCNICOS</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1 flex items-center gap-2">
+                    <span>👓</span>
+                    <span data-es="Snippets & Código Listo para Usar" data-en="Ready-to-Use Code Snippets">Snippets & Código Listo para Usar</span>
+                </h2>
+            </div>
+        </div>
+
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 mb-10 space-y-4">
+            <h3 class="text-base font-bold text-pink-400 code-font flex items-center gap-2" data-es="💡 ¿Cómo usar e integrar estos snippets?" data-en="💡 How to use and integrate these snippets?">
+                💡 ¿Cómo usar e integrar estos snippets?
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed font-light" data-es="Estos bloques contienen funciones JavaScript reutilizables diseñadas para copiarse e incorporarse en cualquier proyecto web. Puedes pegarlos dentro de un archivo separado (ejemplo: app.js) o directamente dentro de la etiqueta <script> de tu documento HTML." data-en="These blocks contain reusable JavaScript functions designed to be copied and integrated into any web project. You can paste them inside a separate file (e.g., app.js) or directly inside your HTML document's <script> tag.">
+                Estos bloques contienen funciones JavaScript reutilizables diseñadas para copiarse e incorporarse en cualquier proyecto web. Puedes pegarlos dentro de un archivo separado (ejemplo: app.js) o directamente dentro de la etiqueta &lt;script&gt; de tu documento HTML.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs code-font">
+                <div class="p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl">
+                    <span class="text-pink-400 font-bold block mb-1" data-es="01. Divisas en Vivo" data-en="01. Live Currency Rates">01. Divisas en Vivo</span>
+                    <span class="text-slate-400 text-[11px]" data-es="Consulta tasas de cambio actualizadas consumiendo un endpoint público gratuito sin autenticación." data-en="Fetch updated exchange rates using a free public endpoint without authentication.">Consulta tasas de cambio actualizadas consumiendo un endpoint público gratuito sin autenticación.</span>
+                </div>
+                <div class="p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl">
+                    <span class="text-indigo-400 font-bold block mb-1" data-es="02. Interés Compuesto" data-en="02. Compound Interest">02. Interés Compuesto</span>
+                    <span class="text-slate-400 text-[11px]" data-es="Calcula el crecimiento financiero proyectado con aportes opcionales y tasa anual configurable." data-en="Calculates projected financial growth with optional contributions and configurable annual rate.">Calcula el crecimiento financiero proyectado con aportes opcionales y tasa anual configurable.</span>
+                </div>
+                <div class="p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl">
+                    <span class="text-emerald-400 font-bold block mb-1" data-es="03. Modo Claro / Oscuro" data-en="03. Dark / Light Mode">03. Modo Claro / Oscuro</span>
+                    <span class="text-slate-400 text-[11px]" data-es="Alterna dinámicamente la clase 'dark' en el DOM y persiste la preferencia mediante localStorage." data-en="Dynamically toggles the 'dark' class on DOM and persists user preference using localStorage.">Alterna dinámicamente la clase 'dark' en el DOM y persiste la preferencia mediante localStorage.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SNIPPETS -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl mb-8">
+            <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+                    <span class="text-xs text-slate-400 code-font ml-2">01_fetch_exchange_rate.js</span>
+                </div>
+                <button onclick="copyCode('snippet-1', this)" class="bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all code-font flex items-center gap-1.5">
+                    <i data-lucide="copy" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span class="copy-label" data-es="Copiar Código" data-en="Copy Code">Copiar Código</span>
+                </button>
+            </div>
+            <pre class="p-6 text-xs md:text-sm code-font text-slate-300 overflow-x-auto leading-relaxed" id="snippet-1"></pre>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl mb-8">
+            <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+                    <span class="text-xs text-slate-400 code-font ml-2">02_compound_interest_calculator.js</span>
+                </div>
+                <button onclick="copyCode('snippet-2', this)" class="bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all code-font flex items-center gap-1.5">
+                    <i data-lucide="copy" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span class="copy-label" data-es="Copiar Código" data-en="Copy Code">Copiar Código</span>
+                </button>
+            </div>
+            <pre class="p-6 text-xs md:text-sm code-font text-slate-300 overflow-x-auto leading-relaxed" id="snippet-2"></pre>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl mb-8">
+            <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+                    <span class="text-xs text-slate-400 code-font ml-2">03_dark_light_theme_toggle.js</span>
+                </div>
+                <button onclick="copyCode('snippet-3', this)" class="bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all code-font flex items-center gap-1.5">
+                    <i data-lucide="copy" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span class="copy-label" data-es="Copiar Código" data-en="Copy Code">Copiar Código</span>
+                </button>
+            </div>
+            <pre class="p-6 text-xs md:text-sm code-font text-slate-300 overflow-x-auto leading-relaxed" id="snippet-3"></pre>
+        </div>
+    </section>
+
+    <!-- NUEVA SECCIÓN COMPLETA DE ARQUITECTURA DEL SISTEMA -->
+    <section id="arquitectura" class="py-20 px-6 max-w-7xl mx-auto border-t border-slate-800">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-slate-800 pb-6 gap-4">
+            <div>
+                <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest code-font" data-es="// FICHA TÉCNICA Y ESPECIFICACIONES" data-en="// SYSTEM SPECIFICATIONS">// FICHA TÉCNICA Y ESPECIFICACIONES</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-1 flex items-center gap-2">
+                    <span>⚡</span>
+                    <span data-es="Arquitectura del Sistema & Protocolos" data-en="System Architecture & Protocols">Arquitectura del Sistema & Protocolos</span>
+                </h2>
+            </div>
+            <p class="text-xs text-slate-400 code-font max-w-md" 
+               data-es="Documentación detallada sobre el stack tecnológico, patrones de diseño, renderizado en cliente y ciclo de purga de datos."
+               data-en="Detailed documentation on tech stack, design patterns, client-side rendering, and data purge lifecycle.">
+                Documentación detallada sobre el stack tecnológico, patrones de diseño, renderizado en cliente y ciclo de purga de datos.
+            </p>
+        </div>
+
+        <!-- GRID DE ARQUITECTURA DETALLADA -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+
+            <!-- BLOQUE 1: FRONTEND & SPA -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 space-y-4 hover:border-pink-500/40 transition-all">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20">
+                        <i data-lucide="layers" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white code-font" data-es="01. Arquitectura Frontend & SPA Engine" data-en="01. Frontend Architecture & SPA Engine">01. Arquitectura Frontend & SPA Engine</h3>
+                        <span class="text-[11px] text-slate-500 code-font" data-es="Single Page Application Vanilla ES6+" data-en="Single Page Application Vanilla ES6+">Single Page Application Vanilla ES6+</span>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed font-light"
+                   data-es="Construido bajo un paradigma de Single Page Application (SPA) puro, sin sobrecarga de frameworks pesados (Zero-Dependency Design). Todo el enrutamiento y la actualización de vistas se gestionan dinámicamente mediante manipulación directa de la API DOM de JavaScript ES6+, logrando tiempos de carga inferiores a 200ms."
+                   data-en="Built on a pure Single Page Application (SPA) paradigm without heavy framework overhead (Zero-Dependency Design). All routing and view rendering are managed dynamically via direct JavaScript ES6+ DOM API manipulation, achieving sub-200ms render times.">
+                    Construido bajo un paradigma de Single Page Application (SPA) puro, sin sobrecarga de frameworks pesados (Zero-Dependency Design). Todo el enrutamiento y la actualización de vistas se gestionan dinámicamente mediante manipulación directa de la API DOM de JavaScript ES6+, logrando tiempos de carga inferiores a 200ms.
+                </p>
+                <div class="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] code-font text-slate-400">
+                    <div><span class="text-pink-400 font-bold">• Paradigm:</span> Client-Side SPA</div>
+                    <div><span class="text-pink-400 font-bold">• Core:</span> Vanilla JavaScript ES6+</div>
+                    <div><span class="text-pink-400 font-bold">• Latency:</span> &lt; 200ms TTFB</div>
+                    <div><span class="text-pink-400 font-bold">• Dependencies:</span> Modular CDN-linked</div>
+                </div>
+            </div>
+
+            <!-- BLOQUE 2: CICLO DE PURGA Y REBOBINADO -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 space-y-4 hover:border-indigo-500/40 transition-all">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white code-font" data-es="02. Ciclo de Purga & Retención a 30 Días" data-en="02. 30-Day Data Retention & Purge Lifecycle">02. Ciclo de Purga & Retención a 30 Días</h3>
+                        <span class="text-[11px] text-slate-500 code-font" data-es="Automated Data Purge & Garbage Collection" data-en="Automated Data Purge & Garbage Collection">Automated Data Purge & Garbage Collection</span>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed font-light"
+                   data-es="El sistema implementa una política de ciclo de vida automatizado de retención de datos de 30 días (30-Day Data Purge Lifecycle). Mediante rutinas de inspección cronológicas ejecutadas al inicializar la aplicación, los registros cuyas marcas de tiempo superen los 30 días naturales son purgados automáticamente mediante un mecanismo simétrico de Recolección de Basura (Garbage Collection) para optimizar memoria."
+                   data-en="The system implements an automated 30-Day Data Retention Lifecycle policy. Through chronological inspection routines executed upon app initialization, entries with timestamps older than 30 calendar days are automatically purged using a symmetric Garbage Collection pattern to optimize client memory.">
+                    El sistema implementa una política de ciclo de vida automatizado de retención de datos de 30 días (30-Day Data Purge Lifecycle). Mediante rutinas de inspección cronológicas ejecutadas al inicializar la aplicación, los registros cuyas marcas de tiempo superen los 30 días naturales son purgados automáticamente mediante un mecanismo simétrico de Recolección de Basura (Garbage Collection) para optimizar memoria.
+                </p>
+                <div class="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] code-font text-slate-400">
+                    <div><span class="text-indigo-400 font-bold">• Retention:</span> 30 Rolling Days</div>
+                    <div><span class="text-indigo-400 font-bold">• Purge Logic:</span> Cron-like Filter</div>
+                    <div><span class="text-indigo-400 font-bold">• Memory Mgmt:</span> Auto GC / Array Shift</div>
+                    <div><span class="text-indigo-400 font-bold">• Data Integrity:</span> ISO-8601 Verification</div>
+                </div>
+            </div>
+
+            <!-- BLOQUE 3: CAPA DE INTEGRACIÓN & APIS -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 space-y-4 hover:border-emerald-500/40 transition-all">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <i data-lucide="cpu" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white code-font" data-es="03. Consumo Asíncrono & Renderizado Canvas" data-en="03. Asynchronous Fetch & Canvas Engine">03. Consumo Asíncrono & Renderizado Canvas</h3>
+                        <span class="text-[11px] text-slate-500 code-font" data-es="REST APIs & 60FPS Animation Canvas" data-en="REST APIs & 60FPS Animation Canvas">REST APIs & 60FPS Animation Canvas</span>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed font-light"
+                   data-es="Consumo de servicios externos mediante la API Fetch nativa con promesas asíncronas (async/await) y manejo de excepciones en caso de degradación de red. La sección Hero integra una simulación física vectorizada utilizando el contexto 2D de la HTML5 Canvas API ejecutada a 60 FPS mediante requestAnimationFrame()."
+                   data-en="External services are consumed using native Fetch API with asynchronous promises (async/await) and fallback error handling. The Hero section features a vectorized physics simulation powered by HTML5 Canvas API 2D context running at 60 FPS via requestAnimationFrame().">
+                    Consumo de servicios externos mediante la API Fetch nativa con promesas asíncronas (async/await) y manejo de excepciones en caso de degradación de red. La sección Hero integra una simulación física vectorizada utilizando el contexto 2D de la HTML5 Canvas API ejecutada a 60 FPS mediante requestAnimationFrame().
+                </p>
+                <div class="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] code-font text-slate-400">
+                    <div><span class="text-emerald-400 font-bold">• API Transport:</span> Fetch API (REST)</div>
+                    <div><span class="text-emerald-400 font-bold">• Canvas FPS:</span> 60 FPS Loop</div>
+                    <div><span class="text-emerald-400 font-bold">• Vector Icons:</span> Lucide SVG Engine</div>
+                    <div><span class="text-emerald-400 font-bold">• Failover:</span> Cached Data Fallback</div>
+                </div>
+            </div>
+
+            <!-- BLOQUE 4: UI/UX & PERSISTENCIA -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 space-y-4 hover:border-amber-500/40 transition-all">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        <i data-lucide="layout" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white code-font" data-es="04. Sistema UI/UX & Persistencia Local" data-en="04. UI/UX Architecture & Local Storage">04. Sistema UI/UX & Persistencia Local</h3>
+                        <span class="text-[11px] text-slate-500 code-font" data-es="Tailwind Utility-First & Client PDF Engine" data-en="Tailwind Utility-First & Client PDF Engine">Tailwind Utility-First & Client PDF Engine</span>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed font-light"
+                   data-es="Interfaz construida bajo el framework de utilidades Tailwind CSS con paleta semántica oscura (#050508). La configuración del usuario (idioma y preferencia visual) persiste localmente en la Web Storage API (localStorage). Además, la generación del archivo PDF técnico se realiza de manera 100% remota al servidor, directamente en el hilo secundario del navegador cliente mediante la librería jsPDF."
+                   data-en="User interface designed using Tailwind CSS utility-first framework with a dark semantic color system (#050508). User settings (language and visual preferences) persist locally via Web Storage API (localStorage). PDF generation is compiled 100% client-side without server roundtrips using the jsPDF library.">
+                    Interfaz construida bajo el framework de utilidades Tailwind CSS con paleta semántica oscura (#050508). La configuración del usuario (idioma y preferencia visual) persiste localmente en la Web Storage API (localStorage). Además, la generación del archivo PDF técnico se realiza de manera 100% remota al servidor, directamente en el hilo secundario del navegador cliente mediante la librería jsPDF.
+                </p>
+                <div class="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] code-font text-slate-400">
+                    <div><span class="text-amber-400 font-bold">• Styling:</span> Tailwind Utility Engine</div>
+                    <div><span class="text-amber-400 font-bold">• Persistence:</span> Web LocalStorage API</div>
+                    <div><span class="text-amber-400 font-bold">• PDF Compiler:</span> Client-Side jsPDF</div>
+                    <div><span class="text-amber-400 font-bold">• Typography:</span> Plus Jakarta + JetBrains</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TABLA COMPACTA DE METRICAS TECNICAS -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 overflow-x-auto">
+            <h4 class="text-xs font-bold text-pink-400 code-font mb-4 uppercase tracking-widest" data-es="// MATRIZ DE RENDIMIENTO Y TECNICALIDADES" data-en="// PERFORMANCE & TECHNICAL MATRIX">// MATRIZ DE RENDIMIENTO Y TECNICALIDADES</h4>
+            <table class="w-full text-left text-xs code-font">
+                <thead>
+                    <tr class="border-b border-slate-800 text-slate-400">
+                        <th class="py-2 px-3" data-es="Componente" data-en="Component">Componente</th>
+                        <th class="py-2 px-3" data-es="Tecnología Base" data-en="Core Technology">Tecnología Base</th>
+                        <th class="py-2 px-3" data-es="Patrón de Ejecución" data-en="Execution Pattern">Patrón de Ejecución</th>
+                        <th class="py-2 px-3" data-es="Impacto / Métrica" data-en="Impact / Metric">Impacto / Métrica</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                    <tr>
+                        <td class="py-2.5 px-3 font-semibold text-white">Rendering Engine</td>
+                        <td class="py-2.5 px-3">HTML5 + ES6 Vanilla DOM</td>
+                        <td class="py-2.5 px-3 text-slate-400">Reactive DOM Manipulation</td>
+                        <td class="py-2.5 px-3 text-emerald-400">0ms Framework Overhead</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2.5 px-3 font-semibold text-white">Data Lifecycle</td>
+                        <td class="py-2.5 px-3">JSON In-Memory Data Structure</td>
+                        <td class="py-2.5 px-3 text-slate-400">Automatic 30-Day Rolling Purge</td>
+                        <td class="py-2.5 px-3 text-indigo-400">Zero Dead Storage</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2.5 px-3 font-semibold text-white">Localization (i18n)</td>
+                        <td class="py-2.5 px-3">Data-Attribute Dynamic Engine</td>
+                        <td class="py-2.5 px-3 text-slate-400">Bi-directional ES / EN Toggle</td>
+                        <td class="py-2.5 px-3 text-pink-400">Instant Switch (0 Reload)</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2.5 px-3 font-semibold text-white">Hero Particle Physics</td>
+                        <td class="py-2.5 px-3">HTML5 Canvas 2D API</td>
+                        <td class="py-2.5 px-3 text-slate-400">requestAnimationFrame Loop</td>
+                        <td class="py-2.5 px-3 text-amber-400">Locked 60 FPS</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-10 px-6 text-center text-xs text-slate-500 code-font">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <span>NEXUS RADAR © 2026 • </span>
+                <span data-es="Colombia Edition" data-en="Colombia Edition">Colombia Edition</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="https://portafolio-jpeg.vercel.app/" target="_blank" rel="noopener" class="text-slate-400 hover:text-pink-400 transition-colors flex items-center gap-1">
+                    <span data-es="Ir a mi Portafolio JPEG" data-en="Go to my JPEG Portfolio">Ir a mi Portafolio JPEG</span>
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                </a>
+                <div id="status-indicator" class="flex items-center gap-2 text-emerald-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span data-es="APIs en Vivo Operativas" data-en="Live APIs Operational">APIs en Vivo Operativas</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const DB_ITEMS = [
+            {
+                id: 1,
+                title_es: "ZAI / CITA Inteligencia Financiera",
+                title_en: "ZAI / CITA Financial Intelligence",
+                type_es: "Web / IA",
+                type_en: "Web / AI",
+                category_es: "Finanzas",
+                category_en: "Finance",
+                desc_es: "Analizador de indicadores financieros y resumen de tasas en tiempo real.",
+                desc_en: "Real-time financial indicators analyzer and currency rate summary tool.",
+                url: "https://zai.finance",
+                date: "2026-08-25",
+                pinned: true
+            },
+            {
+                id: 2,
+                title_es: "Excalidraw Lienzo de Diagramas",
+                title_en: "Excalidraw Diagram Canvas",
+                type_es: "Herramienta",
+                type_en: "Tool",
+                category_es: "Productividad",
+                category_en: "Productivity",
+                desc_es: "Pizarra virtual infinita colaborativa para bosquejar diagramas al instante.",
+                desc_en: "Infinite collaborative virtual whiteboard to sketch diagrams instantly.",
+                url: "https://excalidraw.com",
+                date: "2026-08-22",
+                pinned: false
+            },
+            {
+                id: 3,
+                title_es: "Calculadora de Divisas Wise",
+                title_en: "Wise Live Currency Calculator",
+                type_es: "Plataforma",
+                type_en: "Platform",
+                category_es: "Conversor",
+                category_en: "Converter",
+                desc_es: "Monitor e historial interactivo de tasas de cambio globales sin sobrecostos.",
+                desc_en: "Interactive global exchange rate monitor and history without markups.",
+                url: "https://wise.com",
+                date: "2026-08-20",
+                pinned: false
+            },
+            {
+                id: 4,
+                title_es: "Generador Web V0.dev",
+                title_en: "V0.dev Web Generator",
+                type_es: "Generador IA",
+                type_en: "AI Generator",
+                category_es: "Diseño Web",
+                category_en: "Web Design",
+                desc_es: "Generador de interfaces de usuario modernas utilizando lenguaje natural.",
+                desc_en: "Modern user interface generator using plain natural language.",
+                url: "https://v0.dev",
+                date: "2026-08-15",
+                pinned: false
+            }
+        ];
+
+        const CODE_SNIPPETS = {
+            es: {
+                snippet1: `<code><span class="text-slate-500">// Función asíncrona para consultar el tipo de cambio entre divisas</span>
+<span class="text-purple-400">async function</span> <span class="text-blue-400">getLiveExchangeRate</span>(baseCurrency = <span class="text-emerald-300">'USD'</span>, targetCurrency = <span class="text-emerald-300">'COP'</span>) {
+  <span class="text-purple-400">try</span> {
+    <span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> <span class="text-blue-400">fetch</span>(<span class="text-emerald-300">\`https://open.er-api.com/v6/latest/\${baseCurrency}\`</span>);
+    <span class="text-purple-400">const</span> data = <span class="text-purple-400">await</span> response.<span class="text-blue-400">json</span>();
+    
+    <span class="text-purple-400">if</span> (data.result === <span class="text-emerald-300">'success'</span>) {
+      <span class="text-purple-400">const</span> rate = data.rates[targetCurrency];
+      <span class="text-blue-400">console</span>.<span class="text-blue-400">log</span>(<span class="text-emerald-300">\`Tasa 1 \${baseCurrency} = \${rate} \${targetCurrency}\`</span>);
+      <span class="text-purple-400">return</span> rate;
+    }
+  } <span class="text-purple-400">catch</span> (error) {
+    <span class="text-blue-400">console</span>.<span class="text-blue-400">error</span>(<span class="text-emerald-300">'Error obteniendo divisas:'</span>, error);
+  }
+}
+
+<span class="text-slate-500">// Modo de uso:</span>
+<span class="text-slate-500">// getLiveExchangeRate('USD', 'COP').then(rate => console.log(rate));</span></code>`,
+
+                snippet2: `<code><span class="text-slate-500">// Función matemática para proyección de interés compuesto</span>
+<span class="text-purple-400">function</span> <span class="text-blue-400">calculateCompoundInterest</span>(principal, annualRatePercent, years, monthlyContribution = <span class="text-amber-400">0</span>) {
+  <span class="text-purple-400">const</span> rate = annualRatePercent / <span class="text-amber-400">100</span>;
+  <span class="text-purple-400">let</span> total = principal;
+
+  <span class="text-purple-400">for</span> (<span class="text-purple-400">let</span> month = <span class="text-amber-400">1</span>; month &lt;= years * <span class="text-amber-400">12</span>; month++) {
+    total += monthlyContribution;
+    total *= (<span class="text-amber-400">1</span> + rate / <span class="text-amber-400">12</span>);
+  }
+
+  <span class="text-purple-400">return</span> {
+    finalBalance: Number(total.toFixed(<span class="text-amber-400">2</span>)),
+    totalInvested: principal + (monthlyContribution * years * <span class="text-amber-400">12</span>)
+  };
+}
+
+<span class="text-slate-500">// Modo de uso: $1,000 iniciales, 8% anual, 5 años, $100/mes</span>
+<span class="text-slate-500">// const result = calculateCompoundInterest(1000, 8, 5, 100);</span></code>`,
+
+                snippet3: `<code><span class="text-slate-500">// Gestor de tema Claro/Oscuro con persistencia en localStorage</span>
+<span class="text-purple-400">function</span> <span class="text-blue-400">initDarkModeToggle</span>(buttonElementId) {
+  <span class="text-purple-400">const</span> btn = document.<span class="text-blue-400">getElementById</span>(buttonElementId);
+  <span class="text-purple-400">const</span> currentTheme = localStorage.<span class="text-blue-400">getItem</span>(<span class="text-emerald-300">'theme'</span>);
+
+  <span class="text-purple-400">if</span> (currentTheme === <span class="text-emerald-300">'dark'</span>) {
+    document.documentElement.classList.<span class="text-blue-400">add</span>(<span class="text-emerald-300">'dark'</span>);
+  }
+
+  btn.<span class="text-blue-400">addEventListener</span>(<span class="text-emerald-300">'click'</span>, () => {
+    <span class="text-purple-400">const</span> isDark = document.documentElement.classList.<span class="text-blue-400">toggle</span>(<span class="text-emerald-300">'dark'</span>);
+    localStorage.<span class="text-blue-400">setItem</span>(<span class="text-emerald-300">'theme'</span>, isDark ? <span class="text-emerald-300">'dark'</span> : <span class="text-emerald-300">'light'</span>);
+  });
+}
+
+<span class="text-slate-500">// Modo de uso: Asigna el ID de tu botón HTML</span>
+<span class="text-slate-500">// initDarkModeToggle('theme-btn');</span></code>`
+            },
+            en: {
+                snippet1: `<code><span class="text-slate-500">// Async function to fetch live exchange rates between currencies</span>
+<span class="text-purple-400">async function</span> <span class="text-blue-400">getLiveExchangeRate</span>(baseCurrency = <span class="text-emerald-300">'USD'</span>, targetCurrency = <span class="text-emerald-300">'COP'</span>) {
+  <span class="text-purple-400">try</span> {
+    <span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> <span class="text-blue-400">fetch</span>(<span class="text-emerald-300">\`https://open.er-api.com/v6/latest/\${baseCurrency}\`</span>);
+    <span class="text-purple-400">const</span> data = <span class="text-purple-400">await</span> response.<span class="text-blue-400">json</span>();
+    
+    <span class="text-purple-400">if</span> (data.result === <span class="text-emerald-300">'success'</span>) {
+      <span class="text-purple-400">const</span> rate = data.rates[targetCurrency];
+      <span class="text-blue-400">console</span>.<span class="text-blue-400">log</span>(<span class="text-emerald-300">\`Rate 1 \${baseCurrency} = \${rate} \${targetCurrency}\`</span>);
+      <span class="text-purple-400">return</span> rate;
+    }
+  } <span class="text-purple-400">catch</span> (error) {
+    <span class="text-blue-400">console</span>.<span class="text-blue-400">error</span>(<span class="text-emerald-300">'Error fetching rates:'</span>, error);
+  }
+}
+
+<span class="text-slate-500">// Usage:</span>
+<span class="text-slate-500">// getLiveExchangeRate('USD', 'COP').then(rate => console.log(rate));</span></code>`,
+
+                snippet2: `<code><span class="text-slate-500">// Mathematical function for compound interest projection</span>
+<span class="text-purple-400">function</span> <span class="text-blue-400">calculateCompoundInterest</span>(principal, annualRatePercent, years, monthlyContribution = <span class="text-amber-400">0</span>) {
+  <span class="text-purple-400">const</span> rate = annualRatePercent / <span class="text-amber-400">100</span>;
+  <span class="text-purple-400">let</span> total = principal;
+
+  <span class="text-purple-400">for</span> (<span class="text-purple-400">let</span> month = <span class="text-amber-400">1</span>; month &lt;= years * <span class="text-amber-400">12</span>; month++) {
+    total += monthlyContribution;
+    total *= (<span class="text-amber-400">1</span> + rate / <span class="text-amber-400">12</span>);
+  }
+
+  <span class="text-purple-400">return</span> {
+    finalBalance: Number(total.toFixed(<span class="text-amber-400">2</span>)),
+    totalInvested: principal + (monthlyContribution * years * <span class="text-amber-400">12</span>)
+  };
+}
+
+<span class="text-slate-500">// Usage: $1,000 principal, 8% annual, 5 years, $100/month</span>
+<span class="text-slate-500">// const result = calculateCompoundInterest(1000, 8, 5, 100);</span></code>`,
+
+                snippet3: `<code><span class="text-slate-500">// Light/Dark theme manager with localStorage persistence</span>
+<span class="text-purple-400">function</span> <span class="text-blue-400">initDarkModeToggle</span>(buttonElementId) {
+  <span class="text-purple-400">const</span> btn = document.<span class="text-blue-400">getElementById</span>(buttonElementId);
+  <span class="text-purple-400">const</span> currentTheme = localStorage.<span class="text-blue-400">getItem</span>(<span class="text-emerald-300">'theme'</span>);
+
+  <span class="text-purple-400">if</span> (currentTheme === <span class="text-emerald-300">'dark'</span>) {
+    document.documentElement.classList.<span class="text-blue-400">add</span>(<span class="text-emerald-300">'dark'</span>);
+  }
+
+  btn.<span class="text-blue-400">addEventListener</span>(<span class="text-emerald-300">'click'</span>, () => {
+    <span class="text-purple-400">const</span> isDark = document.documentElement.classList.<span class="text-blue-400">toggle</span>(<span class="text-emerald-300">'dark'</span>);
+    localStorage.<span class="text-blue-400">setItem</span>(<span class="text-emerald-300">'theme'</span>, isDark ? <span class="text-emerald-300">'dark'</span> : <span class="text-emerald-300">'light'</span>);
+  });
+}
+
+<span class="text-slate-500">// Usage: Assign your HTML button ID</span>
+<span class="text-slate-500">// initDarkModeToggle('theme-btn');</span></code>`
+            }
+        };
+
+        let currentLang = 'es';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            
+            // Actualización del label principal de idioma
+            const desktopLangLabel = document.getElementById('current-lang');
+            if (desktopLangLabel) desktopLangLabel.innerText = currentLang.toUpperCase();
+
+            document.querySelectorAll('.mobile-lang-text').forEach(el => {
+                el.innerText = currentLang.toUpperCase();
+            });
+
+            // CORRECCIÓN DEL BUSCADOR: Actualizar Placeholder dinámicamente
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.placeholder = searchInput.getAttribute(`data-${currentLang}-placeholder`);
+            }
+            
+            // Actualizar todos los elementos traducibles
+            document.querySelectorAll('[data-es]').forEach(el => {
+                el.innerText = el.getAttribute(`data-${currentLang}`);
+            });
+
+            renderAllSections();
+        }
+
+        function renderCodeSnippets() {
+            document.getElementById('snippet-1').innerHTML = CODE_SNIPPETS[currentLang].snippet1;
+            document.getElementById('snippet-2').innerHTML = CODE_SNIPPETS[currentLang].snippet2;
+            document.getElementById('snippet-3').innerHTML = CODE_SNIPPETS[currentLang].snippet3;
+        }
+
+        function renderTodaySection(items) {
+            const pinnedContainer = document.getElementById('pinned-container');
+            const todayBody = document.getElementById('today-table-body');
+
+            pinnedContainer.innerHTML = '';
+            todayBody.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const title = currentLang === 'es' ? item.title_es : item.title_en;
+                const desc = currentLang === 'es' ? item.desc_es : item.desc_en;
+                const type = currentLang === 'es' ? item.type_es : item.type_en;
+
+                if (item.pinned) {
+                    pinnedContainer.innerHTML = `
+                        <div class="relative bg-gradient-to-r from-pink-950/40 via-slate-900 to-indigo-950/40 border-l-4 border-pink-500 rounded-r-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-glow">
+                            <div class="space-y-2 max-w-3xl">
+                                <div class="flex items-center gap-3">
+                                    <span class="px-2.5 py-0.5 rounded bg-pink-500/20 text-pink-400 text-xs font-bold code-font">${currentLang === 'es' ? 'RECOMENDADO HOY' : 'RECOMMENDED TODAY'}</span>
+                                    <span class="text-xs text-slate-400 code-font">${item.date}</span>
+                                </div>
+                                <h3 class="text-2xl font-bold text-white">${title}</h3>
+                                <p class="text-sm text-slate-300 font-light leading-relaxed">${desc}</p>
+                            </div>
+                            <a href="${item.url}" target="_blank" rel="noopener" class="shrink-0 px-6 py-3 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs code-font transition-all flex items-center gap-2">
+                                <span>${currentLang === 'es' ? 'VISITAR SITIO' : 'VISIT WEBSITE'}</span>
+                                <i data-lucide="external-link" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    todayBody.innerHTML += `
+                        <div class="data-item border-b border-slate-800/80 border-l-2 border-l-transparent row-hover py-4 px-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex items-start md:items-center gap-4">
+                                <span class="text-xs text-slate-500 code-font w-8">0${index + 1}</span>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-base font-semibold text-slate-100">${title}</h4>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 code-font">${type}</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 font-light mt-0.5">${desc}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 shrink-0">
+                                <span class="text-xs text-slate-500 code-font">${item.date}</span>
+                                <a href="${item.url}" target="_blank" rel="noopener" class="text-xs text-pink-400 hover:text-pink-300 font-bold code-font flex items-center gap-1">
+                                    <span>${currentLang === 'es' ? 'ENLACE' : 'LINK'}</span>
+                                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            lucide.createIcons();
+        }
+
+        function renderZigZagTimeline(items) {
+            const container = document.getElementById('zigzag-container');
+            container.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const title = currentLang === 'es' ? item.title_es : item.title_en;
+                const desc = currentLang === 'es' ? item.desc_es : item.desc_en;
+                const type = currentLang === 'es' ? item.type_es : item.type_en;
+                const category = currentLang === 'es' ? item.category_es : item.category_en;
+                const isLeft = index % 2 === 0;
+                const numStr = String(index + 1).padStart(2, '0');
+
+                container.innerHTML += `
+                    <div class="relative flex flex-col md:flex-row items-center ${isLeft ? 'md:flex-row-reverse' : ''} data-item">
+                        <div class="w-full md:w-1/2 p-4">
+                            <div class="bg-slate-900/90 border border-slate-800 hover:border-pink-500/50 p-6 rounded-2xl transition-all shadow-xl space-y-3">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-black text-pink-500 code-font">#${numStr}</span>
+                                        <span class="text-[11px] font-bold px-2 py-0.5 rounded border border-pink-500/30 bg-pink-500/10 text-pink-300 backdrop-blur-sm code-font">
+                                            [${type} / ${category}]
+                                        </span>
+                                    </div>
+                                    <span class="text-xs text-slate-400 font-semibold code-font">${item.date}</span>
+                                </div>
+                                <h4 class="text-lg font-bold text-white">${title}</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed font-light">${desc}</p>
+                                <a href="${item.url}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-pink-400 font-semibold code-font pt-1">
+                                    <span>${currentLang === 'es' ? 'Ver plataforma' : 'View platform'}</span>
+                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-pink-500 border-4 border-slate-950 hidden md:block"></div>
+                        <div class="w-full md:w-1/2"></div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function copyCode(elementId, btn) {
+            const codeText = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const label = btn.querySelector('.copy-label');
+                const originalText = label.innerText;
+                label.innerText = currentLang === 'es' ? '¡Copiado!' : 'Copied!';
+                btn.classList.add('bg-emerald-600', 'text-white');
+                setTimeout(() => {
+                    label.innerText = originalText;
+                    btn.classList.remove('bg-emerald-600', 'text-white');
+                }, 2000);
+            });
+        }
+
+        function filterContent() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const items = document.querySelectorAll('.data-item');
+
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.text('NEXUS TECH RADAR - RECURSOS DESTACADOS', 15, 20);
+
+            let yPos = 35;
+            DB_ITEMS.forEach((item, idx) => {
+                const title = currentLang === 'es' ? item.title_es : item.title_en;
+                const desc = currentLang === 'es' ? item.desc_es : item.desc_en;
+                const type = currentLang === 'es' ? item.type_es : item.type_en;
+
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${idx + 1}. ${title}`, 15, yPos);
+                
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Fecha: ${item.date} | Categoria: ${type}`, 15, yPos + 5);
+                doc.text(`Descripcion: ${desc}`, 15, yPos + 10);
+                doc.text(`Enlace: ${item.url}`, 15, yPos + 15);
+
+                yPos += 25;
+            });
+
+            doc.save('Nexus_Radar_Colombia.pdf');
+        }
+
+        function renderAllSections() {
+            renderTodaySection(DB_ITEMS);
+            renderZigZagTimeline(DB_ITEMS);
+            renderCodeSnippets();
+        }
+
+        function initCanvas() {
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const particles = Array.from({ length: 40 }, () => ({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                radius: Math.random() * 2 + 1,
+                color: 'rgba(236, 72, 153, 0.25)'
+            }));
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAllSections();
+            initCanvas();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
